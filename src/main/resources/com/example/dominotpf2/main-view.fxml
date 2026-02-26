@@ -16,6 +16,8 @@
                     </children>
                 </HBox>
 
+                <Label fx:id="lblErrorLobby" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="" textFill="#ff5555" wrapText="true" textAlignment="CENTER" />
+
                 <TextArea fx:id="txtAreaLobby" editable="false" prefHeight="150.0" prefWidth="300.0" style="-fx-background-color: transparent; -fx-control-inner-background: transparent; -fx-background: transparent; -fx-text-box-border: transparent; -fx-focus-color: transparent; -fx-faint-focus-color: transparent; -fx-text-fill: white; -fx-font-size: 18px;" />
 
                 <Label style="-fx-font-size: 14px; -fx-font-style: italic;" text="El juego comenzará automáticamente cuando la sala esté llena." textFill="LIGHTGRAY" />

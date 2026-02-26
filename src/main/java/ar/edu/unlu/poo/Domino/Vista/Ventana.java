@@ -45,6 +45,7 @@ public class Ventana implements IVista{
     @FXML private Button btnNuevaPartida;
     @FXML private Button btnSalir;
     @FXML private VBox cajaTop5;
+    @FXML private Label lblErrorLobby;
 
     private enum Pantalla{
         LOBBY, JUEGO, RESULTADOS
@@ -69,7 +70,24 @@ public class Ventana implements IVista{
 
     @Override
     public void mostrarMensaje(String mensaje){
-        Platform.runLater(() -> lblMensajes.setText(mensaje));
+        Platform.runLater(() -> {
+            // Actualiza el label del juego (si la partida ya empezó)
+            if (lblMensajes != null) {
+                lblMensajes.setText(mensaje);
+            }
+
+            // Actualiza el label del lobby (si todavía están esperando/conectando)
+            if (lblErrorLobby != null) {
+                // Si es un mensaje normal de conexión, lo ponemos en blanco o celeste.
+                // Si contiene la palabra "Error" o "ya comenzó", lo dejamos en rojo.
+                if (mensaje.toLowerCase().contains("error") || mensaje.toLowerCase().contains("no puedes")) {
+                    lblErrorLobby.setStyle("-fx-text-fill: #ff5555; -fx-font-size: 16px; -fx-font-weight: bold;");
+                } else {
+                    lblErrorLobby.setStyle("-fx-text-fill: #00ffff; -fx-font-size: 16px; -fx-font-weight: bold;");
+                }
+                lblErrorLobby.setText(mensaje);
+            }
+        });
     }
 
     @Override

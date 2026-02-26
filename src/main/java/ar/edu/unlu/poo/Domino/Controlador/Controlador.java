@@ -35,12 +35,19 @@ public class Controlador implements IControladorRemoto {
                 vista.mostrarMensaje("No se pudo conectar.");
             }
         } catch (RemoteException e) {
-            vista.mostrarMensaje("Error de conexión: " + e.getMessage());
+            this.jugadorLocal = null;
+            //vista.mostrarMensaje("Error de conexión: " + e.getMessage());
+            vista.mostrarMensaje(limpiarMensajeError(e));
         }
     }
 
     public void intentarJugarFicha(int indice, Lado lado){
         try{
+            if (!partida.getJugadorActual().getNombre().equals(this.jugadorLocal)) {
+                vista.mostrarMensaje("No es tu turno. Por favor, espera.");
+                return;
+            }
+
             if(indice < 0 || indice >= partida.getManoJugador(jugadorLocal).size()){
                 vista.mostrarMensaje("Índice inválido.");
                 vista.activarControles(partida.getMesa().estaVacia());
@@ -51,7 +58,8 @@ public class Controlador implements IControladorRemoto {
             partida.realizarJugada(f, lado);
             vista.desactivarControles();
         } catch (RemoteException e) {
-            vista.mostrarMensaje(e.getMessage());
+            //vista.mostrarMensaje(e.getMessage());
+            vista.mostrarMensaje(limpiarMensajeError(e));
             try {
                 vista.activarControles(partida.getMesa().estaVacia());
             } catch (RemoteException ex) {
@@ -65,7 +73,8 @@ public class Controlador implements IControladorRemoto {
             partida.pasarTurno();
             vista.desactivarControles();
         } catch (RemoteException e) {
-            vista.mostrarMensaje(e.getMessage());
+            //vista.mostrarMensaje(e.getMessage());
+            vista.mostrarMensaje(limpiarMensajeError(e));
             try {
                 vista.activarControles(partida.getMesa().estaVacia());
             } catch (RemoteException ex) {
@@ -121,6 +130,23 @@ public class Controlador implements IControladorRemoto {
         }
     }
 
+    private String limpiarMensajeError(RemoteException e) {
+        Throwable causa = e.getCause();
+        while (causa != null && causa.getCause() != null) {
+            causa = causa.getCause();
+        }
+        if (causa != null && causa.getMessage() != null) {
+            return causa.getMessage();
+        }
+
+        String msg = e.getMessage();
+        if (msg != null && msg.contains(":")) {
+            String[] partes = msg.split(":");
+            return partes[partes.length - 1].trim();
+        }
+        return msg != null ? msg : "Error de comunicación con el servidor.";
+    }
+
     public void cerrarMesa() {
         try {
             partida.cerrarMesa();
@@ -143,6 +169,8 @@ public class Controlador implements IControladorRemoto {
                 break;
             case INICIO_PARTIDA:
             case CAMBIO_DE_TURNO:
+                if (this.jugadorLocal == null) break;
+
                 if(!partida.rondaTerminada()){
                     String actual = partida.getJugadorActual().getNombre();
 
@@ -161,9 +189,13 @@ public class Controlador implements IControladorRemoto {
                 }
                 break;
             case FIN_DE_RONDA:
+                if (this.jugadorLocal == null) break;
+
                 gestionarFinRonda();
                 break;
             case FIN_DE_PARTIDA:
+                if (this.jugadorLocal == null) break;
+
                 try {
                     Jugador ganador = partida.obtenerGanadorRonda();
                     int puntos = partida.calcularPuntosGanadorRonda();
@@ -181,12 +213,18 @@ public class Controlador implements IControladorRemoto {
                 }
                 break;
             case JUGADOR_ROBO_FICHA:
+                if (this.jugadorLocal == null) break;
+
                 vista.mostrarMensaje(">>> El jugador ROBÓ una ficha del pozo. <<<");
                 break;
             case JUGADOR_PASO_TURNO:
+                if (this.jugadorLocal == null) break;
+
                 vista.mostrarMensaje(">>> El jugador PASÓ su turno (Pozo vacío). <<<");
                 break;
             case MESA_CERRADA:
+                if (this.jugadorLocal == null) break;
+
                 vista.mostrarCierreJuego();
                 break;
             default:
