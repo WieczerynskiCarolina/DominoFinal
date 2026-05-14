@@ -38,7 +38,7 @@ public interface IPartida extends IObservableRemoto {
     boolean conectarJugador(String nombre) throws RemoteException;
     int getCantidadJugadoresRequeridos() throws RemoteException;
     ArrayList<Ficha> getManoJugador(String nombre) throws RemoteException;
-    List<Integer> getIndicesJugables(String nombreNombre) throws RemoteException;
+    List<Integer> getIndicesJugables(String nombreJugador) throws RemoteException;
     void reiniciarPartida(int nuevoLimite) throws RemoteException;
     void cerrarMesa() throws RemoteException;
 }

@@ -46,9 +46,12 @@ public class Ventana implements IVista{
     @FXML private Button btnSalir;
     @FXML private VBox cajaTop5;
     @FXML private Label lblErrorLobby;
+    @FXML private VBox panelInicio;
+    @FXML private Button btnIrALobby;
+    @FXML private Label lblErrorInicio;
 
     private enum Pantalla{
-        LOBBY, JUEGO, RESULTADOS
+        INICIO, LOBBY, JUEGO, RESULTADOS
     }
 
     @Override
@@ -58,34 +61,26 @@ public class Ventana implements IVista{
 
     @Override
     public void iniciar(){
-        Platform.runLater(() -> {
-            String nombre = pedirNombreJugador();
-            if(nombre != null && !nombre.trim().isEmpty()){
-                controlador.conectar(nombre);
-            } else{
-                mostrarMensaje("El nombre no puede estar vacío. Reinicie la aplicación.");
-            }
-        });
+        cambiarPantalla(Pantalla.INICIO);
     }
 
     @Override
     public void mostrarMensaje(String mensaje){
         Platform.runLater(() -> {
-            // Actualiza el label del juego (si la partida ya empezó)
-            if (lblMensajes != null) {
-                lblMensajes.setText(mensaje);
-            }
+            if (lblMensajes != null) lblMensajes.setText(mensaje);
 
-            // Actualiza el label del lobby (si todavía están esperando/conectando)
             if (lblErrorLobby != null) {
-                // Si es un mensaje normal de conexión, lo ponemos en blanco o celeste.
-                // Si contiene la palabra "Error" o "ya comenzó", lo dejamos en rojo.
                 if (mensaje.toLowerCase().contains("error") || mensaje.toLowerCase().contains("no puedes")) {
                     lblErrorLobby.setStyle("-fx-text-fill: #ff5555; -fx-font-size: 16px; -fx-font-weight: bold;");
                 } else {
                     lblErrorLobby.setStyle("-fx-text-fill: #00ffff; -fx-font-size: 16px; -fx-font-weight: bold;");
                 }
                 lblErrorLobby.setText(mensaje);
+            }
+
+            // Agregamos el aviso a la pantalla de inicio también
+            if (lblErrorInicio != null) {
+                lblErrorInicio.setText(mensaje);
             }
         });
     }
@@ -174,7 +169,6 @@ public class Ventana implements IVista{
                         imgMano.setEffect(new Glow(0.6));
                         imgMano.setStyle("-fx-cursor: hand;");
 
-                        /*imgMano.setOnMouseClicked(event -> seleccionarFicha(indexSeleccionado));*/
                         imgMano.setOnMouseClicked(event -> {
                             resaltarFichaSeleccionada(imgMano); // Primero la iluminamos en pantalla
                             seleccionarFicha(indexSeleccionado); // Luego le avisamos a la lógica interna
@@ -254,12 +248,14 @@ public class Ventana implements IVista{
     private void cambiarPantalla(Pantalla pantalla) {
         Platform.runLater(() -> {
             // Apagamos todos
+            if(panelInicio != null) { panelInicio.setVisible(false); panelInicio.setManaged(false); }
             panelLobby.setVisible(false); panelLobby.setManaged(false);
             panelJuego.setVisible(false); panelJuego.setManaged(false);
             panelResultados.setVisible(false); panelResultados.setManaged(false);
 
             // Prendemos solo el que nos piden
             switch (pantalla) {
+                case INICIO -> { panelInicio.setVisible(true); panelInicio.setManaged(true); }
                 case LOBBY -> { panelLobby.setVisible(true); panelLobby.setManaged(true); }
                 case JUEGO -> { panelJuego.setVisible(true); panelJuego.setManaged(true); }
                 case RESULTADOS -> { panelResultados.setVisible(true); panelResultados.setManaged(true); }
@@ -289,6 +285,16 @@ public class Ventana implements IVista{
 
     @FXML
     public void initialize() {
+        btnIrALobby.setOnAction(event -> {
+            lblErrorInicio.setText(""); // Limpiamos errores previos
+            String nombre = pedirNombreJugador();
+            if(nombre != null && !nombre.trim().isEmpty()){
+                controlador.conectar(nombre);
+            } else{
+                lblErrorInicio.setText("El nombre no puede estar vacío.");
+            }
+        });
+
         panelLobby.setVisible(true);
         panelLobby.setManaged(true);
 
@@ -303,6 +309,10 @@ public class Ventana implements IVista{
         try {
             String rutaLobby = getClass().getResource("/com/example/dominotpf2/imagenes/fondos/fondo_lobby.png").toExternalForm();
             String rutaJuego = getClass().getResource("/com/example/dominotpf2/imagenes/fondos/fondo_juego.png").toExternalForm();
+
+            panelInicio.setStyle("-fx-background-image: url('" + rutaLobby + "'); " +
+                    "-fx-background-size: 100% 100%; " +
+                    "-fx-background-position: center center;");
 
             panelLobby.setStyle("-fx-background-image: url('" + rutaLobby + "'); " +
                     "-fx-background-size: 100% 100%; " +
@@ -387,21 +397,6 @@ public class Ventana implements IVista{
         return result.orElse("Anónimo");
     }
 
-    /*@Override
-    public void mostrarFinRonda(String ganador, int puntos) {
-        cambiarPantalla(Pantalla.RESULTADOS);
-
-        Platform.runLater(() -> {
-            String msg = (ganador != null)
-                    ? "¡GANADOR DE LA RONDA: " + ganador.toUpperCase() + "! (+ " + puntos + " puntos)"
-                    : "¡JUEGO CERRADO! Nadie pudo mover.";
-            lblTituloResultado.setText(msg);
-
-            btnContinuarRonda.setVisible(false);
-            lblRankingTop5.setText("");
-        });
-    }*/
-
     @Override
     public void mostrarFinRonda(String ganador, int puntos) {
         cambiarPantalla(Pantalla.RESULTADOS);
@@ -436,14 +431,6 @@ public class Ventana implements IVista{
         });
     }
 
-    /*@Override
-    public void mostrarCierreJuego() {
-        Platform.runLater(() -> {
-            lblTituloResultado.setText("El ganador cerró la mesa.\n¡Gracias por jugar!");
-            lblRankingTop5.setText("");
-        });
-    }*/
-
     @Override
     public void mostrarCierreJuego() {
         Platform.runLater(() -> {
@@ -451,25 +438,6 @@ public class Ventana implements IVista{
         });
     }
 
-    /*@Override
-    public void mostrarGanadorJuego(String nombreGanador, boolean soyElGanador) {
-        cambiarPantalla(Pantalla.RESULTADOS);
-        Platform.runLater(() -> {
-            lblTituloResultado.setText("¡FIN DEL JUEGO!\nGanador de la partida: " + nombreGanador.toUpperCase());
-            btnContinuarRonda.setVisible(false);
-
-            btnSalir.setVisible(true);
-            btnNuevaPartida.setVisible(soyElGanador);
-
-            btnSalir.setOnAction(event -> {
-                if (soyElGanador) {
-                    controlador.cerrarMesa();
-                }
-                Platform.exit();
-                System.exit(0);
-            });
-        });
-    }*/
 
     @Override
     public void mostrarGanadorJuego(String nombreGanador, boolean soyElGanador) {

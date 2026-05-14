@@ -16,7 +16,7 @@
                     </children>
                 </HBox>
 
-                <Label fx:id="lblErrorLobby" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="" textFill="#ff5555" wrapText="true" textAlignment="CENTER" />
+                <Label fx:id="lblErrorLobby" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="" textAlignment="CENTER" textFill="#ff5555" wrapText="true" />
 
                 <TextArea fx:id="txtAreaLobby" editable="false" prefHeight="150.0" prefWidth="300.0" style="-fx-background-color: transparent; -fx-control-inner-background: transparent; -fx-background: transparent; -fx-text-box-border: transparent; -fx-focus-color: transparent; -fx-faint-focus-color: transparent; -fx-text-fill: white; -fx-font-size: 18px;" />
 
@@ -92,6 +92,17 @@
             <padding>
                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
             </padding>
+        </VBox>
+
+        <VBox fx:id="panelInicio" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <Label style="-fx-font-size: 65px; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, #00ffff, 15, 0.5, 0, 0);" text="DOMINÓ" textFill="WHITE" />
+                <Label style="-fx-font-size: 20px; -fx-font-style: italic;" text="Proyecto de Programación Orientada a Objetos" textFill="LIGHTGRAY" />
+
+                <Label fx:id="lblErrorInicio" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="" textFill="#ff5555" wrapText="true" textAlignment="CENTER" />
+
+                <Button fx:id="btnIrALobby" mnemonicParsing="false" style="-fx-font-size: 18px; -fx-padding: 10 40; -fx-background-color: #00ffff; -fx-text-fill: black; -fx-font-weight: bold; -fx-cursor: hand;" text="JUGAR" />
+            </children>
         </VBox>
 
     </children>
