@@ -41,6 +41,14 @@ public class VistaGUI extends Application{
             }
         });
 
+        stage.setOnCloseRequest(e ->{
+            try{
+                stop();
+            } catch (Exception ex) {
+                System.exit(0);
+            }
+        });
+
         stage.setTitle("POO Dominó");
         stage.setScene(scene);
         stage.show();

@@ -161,6 +161,7 @@ public class Controlador implements IControladorRemoto {
 
         switch (evento){
             case JUGADOR_CONECTADO:
+                if(this.jugadorLocal == null) break;
                 List<String> nombres = new ArrayList<>();
                 for(Jugador j: partida.getJugadores()){
                     nombres.add(j.getNombre());
